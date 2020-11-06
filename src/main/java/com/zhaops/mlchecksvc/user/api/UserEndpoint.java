@@ -33,7 +33,6 @@ public class UserEndpoint {
 
     /**
      * 获取用户列表
-     *
      * @return
      */
     @UserLoginToken
@@ -46,7 +45,6 @@ public class UserEndpoint {
 
     /**
      * 添加用户
-     *
      * @param id
      * @param userDto
      * @return
@@ -59,7 +57,6 @@ public class UserEndpoint {
 
     /**
      * 登录
-     *
      * @param id
      * @param userDto
      * @return
