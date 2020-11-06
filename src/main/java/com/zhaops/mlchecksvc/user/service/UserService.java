@@ -5,6 +5,8 @@ import com.zhaops.mlchecksvc.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 /**
  * @author SoYuan
  */
@@ -14,14 +16,14 @@ public interface UserService {
      * @param pageable 分页参数
      * @return 分页数据
      */
-    Page<User> getPage(Pageable pageable);
+    List<UserDto> getPage(Pageable pageable);
 
     /**
      * 保存/更新用户
      * @param userDto
      * @return
      */
-    User save(UserDto userDto);
+    UserDto save(UserDto userDto);
 
 
     /**
@@ -29,11 +31,19 @@ public interface UserService {
      * @param id 用户主键
      * @return
      */
-    User load(Long id);
+    UserDto load(Long id);
 
     /**
      * 删除指定的用户
      * @param id 所要删除的用户主键
      */
     void delete(Long id);
+
+    /**
+     * 登录
+     * @param userName
+     * @param password
+     * @return
+     */
+    UserDto login(String userName,String password);
 }

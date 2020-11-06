@@ -9,6 +9,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * @author SoYuan
  */
@@ -18,25 +21,29 @@ public class UserServiceImpl implements UserService {
     protected UserRepository userRepository;
 
     @Override
-    public Page<User> getPage(Pageable pageable) {
-        return this.userRepository.findAll(pageable);
+    public List<UserDto> getPage(Pageable pageable) {
+        Page<User> page = this.userRepository.findAll(pageable);
+        return page.getContent().stream().map((user) -> {
+            return new UserDto(user);
+        }).collect(Collectors.toList());
     }
 
     @Override
-    public User save(UserDto userDto) {
+    public UserDto save(@org.jetbrains.annotations.NotNull UserDto userDto) {
         User user = new User();
         user.setUserName(userDto.getUserName());
         user.setPassword(userDto.getPassword());
         user.setCompanyName(userDto.getCompanyName());
         user.setIsDelete(0);
         user.setExpired(userDto.getExpired());
-        return this.userRepository.save(user);
+        user = this.userRepository.save(user);
+        return new UserDto(user);
     }
 
     @Override
-    public User load(Long id) {
-        return this
-                .userRepository.getOne(id);
+    public UserDto load(Long id) {
+        User user = this.userRepository.findById(id).get();
+        return new UserDto(user);
     }
 
     @Override
@@ -44,6 +51,12 @@ public class UserServiceImpl implements UserService {
         User user = this.userRepository.getOne(id);
         user.setIsDelete(0);
         this.userRepository.save(user);
+    }
+
+    @Override
+    public UserDto login(String userName, String password) {
+        User user = this.userRepository.login(userName, password);
+        return new UserDto(user);
     }
 
 
