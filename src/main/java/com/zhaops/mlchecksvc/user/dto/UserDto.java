@@ -15,6 +15,9 @@ public class UserDto implements Serializable {
     }
 
     public UserDto(User user) {
+        if (user == null) {
+            return;
+        }
         this.id = user.getId();
         this.userName = user.getUserName();
         this.password = user.getPassword();
@@ -22,6 +25,7 @@ public class UserDto implements Serializable {
         this.companyName = user.getCompanyName();
         this.expired = user.getExpired();
         this.isDelete = user.getIsDelete();
+        this.isAdmin = user.getIsAdmin();
     }
 
     /**
@@ -39,7 +43,7 @@ public class UserDto implements Serializable {
     /**
      * 最后登录日期
      */
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date lastLoginTime;
 
     /**
@@ -56,8 +60,14 @@ public class UserDto implements Serializable {
     /**
      * 过期时间
      */
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date expired;
+
+
+    /**
+     * 是否是超级管理员
+     */
+    private int isAdmin;
 
 
     public Long getId() {
@@ -114,5 +124,13 @@ public class UserDto implements Serializable {
 
     public void setExpired(Date expired) {
         this.expired = expired;
+    }
+
+    public int getIsAdmin() {
+        return isAdmin;
+    }
+
+    public void setIsAdmin(int isAdmin) {
+        this.isAdmin = isAdmin;
     }
 }

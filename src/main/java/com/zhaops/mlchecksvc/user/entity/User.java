@@ -50,6 +50,12 @@ public class User {
     @Column(name = "expired")
     private Date expired;
 
+    /**
+     * 是否是超级管理员
+     */
+    @Column(name = "isAdmin")
+    private int isAdmin;
+
 
 
     public Long getId() {
@@ -106,5 +112,13 @@ public class User {
 
     public void setExpired(Date expired) {
         this.expired = expired;
+    }
+
+    public int getIsAdmin() {
+        return isAdmin;
+    }
+
+    public void setIsAdmin(int isAdmin) {
+        this.isAdmin = isAdmin;
     }
 }

@@ -9,8 +9,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Date;
+
 
 /**
  * @author SoYuan
@@ -21,11 +21,8 @@ public class UserServiceImpl implements UserService {
     protected UserRepository userRepository;
 
     @Override
-    public List<UserDto> getPage(Pageable pageable) {
-        Page<User> page = this.userRepository.findAll(pageable);
-        return page.getContent().stream().map((user) -> {
-            return new UserDto(user);
-        }).collect(Collectors.toList());
+    public Page<User> getPage(Pageable pageable) {
+        return this.userRepository.findAll(pageable);
     }
 
     @Override
@@ -56,7 +53,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto login(String userName, String password) {
         User user = this.userRepository.login(userName, password);
-        return new UserDto(user);
+
+        /**修改最后登录时间 */
+        user.setLastLoginTime(new Date());
+        user = this.userRepository.save(user);
+
+        return user != null ? new UserDto(user) : null;
     }
 
 

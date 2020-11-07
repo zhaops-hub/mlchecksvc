@@ -16,7 +16,7 @@ public interface UserService {
      * @param pageable 分页参数
      * @return 分页数据
      */
-    List<UserDto> getPage(Pageable pageable);
+    Page<User> getPage(Pageable pageable);
 
     /**
      * 保存/更新用户
