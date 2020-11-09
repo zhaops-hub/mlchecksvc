@@ -13,13 +13,23 @@ import java.util.List;
 public interface UserService {
     /**
      * 获取商品配置的分页数据
+     *
      * @param pageable 分页参数
      * @return 分页数据
      */
     Page<User> getPage(Pageable pageable);
 
     /**
+     * 条件查询
+     * @param where
+     * @param pageable
+     * @return
+     */
+    Page<User> getUsers(User where, Pageable pageable);
+
+    /**
      * 保存/更新用户
+     *
      * @param userDto
      * @return
      */
@@ -28,6 +38,7 @@ public interface UserService {
 
     /**
      * 加载指定的用户信息
+     *
      * @param id 用户主键
      * @return
      */
@@ -35,15 +46,25 @@ public interface UserService {
 
     /**
      * 删除指定的用户
+     *
      * @param id 所要删除的用户主键
      */
     void delete(Long id);
 
     /**
      * 登录
+     *
      * @param userName
      * @param password
      * @return
      */
-    UserDto login(String userName,String password);
+    UserDto login(String userName, String password);
+
+    /**
+     * 检查用户名是否存在
+     *
+     * @param userName
+     * @return
+     */
+    UserDto existUserName(String userName);
 }

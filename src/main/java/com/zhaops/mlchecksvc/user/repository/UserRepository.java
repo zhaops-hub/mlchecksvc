@@ -19,4 +19,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
      */
     @Query(value = "select * from userinfo where user_name = ?1 and password = ?2 ", nativeQuery = true)
     public User login(String userName, String password);
+
+    /**
+     * 通过用户名查找账号
+     * @param userName
+     * @return
+     */
+    @Query(value = "select * from userinfo where user_name = ?1 ", nativeQuery = true)
+    public  User getUserByUserName(String userName);
 }

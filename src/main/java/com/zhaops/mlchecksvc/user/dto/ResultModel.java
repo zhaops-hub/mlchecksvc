@@ -8,6 +8,7 @@ public class ResultModel<T> {
     private String msg;
     private T Data;
     private Long total;
+    private int pages;
 
     public int getCode() {
         return code;
@@ -39,5 +40,14 @@ public class ResultModel<T> {
 
     public void setTotal(Long total) {
         this.total = total;
+    }
+
+
+    public int getPages() {
+        return pages;
+    }
+
+    public void setPages(int pages) {
+        this.pages = pages;
     }
 }

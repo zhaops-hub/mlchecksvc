@@ -1,5 +1,7 @@
 package com.zhaops.mlchecksvc.user.api;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.auth0.jwt.JWT;
 import com.zhaops.mlchecksvc.user.common.UserLoginToken;
 import com.zhaops.mlchecksvc.user.dto.ResultModel;
@@ -31,7 +33,6 @@ public class UserEndpoint {
     @Autowired
     private TokenService tokenService;
 
-
     /**
      * 获取用户列表
      *
@@ -39,18 +40,20 @@ public class UserEndpoint {
      */
     @UserLoginToken
     @RequestMapping(method = RequestMethod.GET)
-    public ResultModel<List<UserDto>> findAll(Integer page, Integer rows) {
+    public ResultModel<List<UserDto>> findAll(@RequestParam(required = false) String userName, Integer page, Integer rows) {
         page = page == null ? 1 : page;
         rows = rows == null ? Integer.MAX_VALUE : rows;
         Pageable pageable = PageRequest.of(page - 1, rows, Sort.by(Sort.Direction.ASC, "id"));
         ResultModel<List<UserDto>> resultModel = new ResultModel<>();
-
-        Page<User> pageUsers = this.userService.getPage(pageable);
+        User where = new User();
+        where.setUserName(userName);
+        Page<User> pageUsers = this.userService.getUsers(where, pageable);
         List<UserDto> users = pageUsers.getContent().stream().map((user) -> {
             return new UserDto(user);
         }).collect(Collectors.toList());
         resultModel.setData(users);
         resultModel.setTotal(pageUsers.getTotalElements());
+        resultModel.setPages(pageUsers.getTotalPages());
         return resultModel;
     }
 
@@ -139,6 +142,22 @@ public class UserEndpoint {
         String userId = JWT.decode(token).getAudience().get(0);
         UserDto user = userService.load(Long.parseLong(userId));
         result.setData(user);
+        return result;
+    }
+
+    /**
+     * 查看用户名是否存在
+     *
+     * @param userName
+     * @return
+     */
+    @UserLoginToken
+    @RequestMapping(value = "/existUserName/{userName}", method = RequestMethod.GET)
+    public ResultModel<Boolean> existUserName(@PathVariable String userName) {
+        ResultModel<Boolean> result = new ResultModel<>();
+        result.setCode(0);
+        Boolean isExit = this.userService.existUserName(userName) != null;
+        result.setData(isExit);
         return result;
     }
 }
