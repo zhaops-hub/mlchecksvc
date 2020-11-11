@@ -1,0 +1,10 @@
+version: "3"
+services:
+  mlchecksvc:
+    image: mlchecksvc:0.1
+    container_name: mlchecksvc
+    ports:
+      - 3000:3000
+    volumes:
+      - ./svc/mlchecksvc-0.0.1-SNAPSHOT.jar:/app.jar
+    restart: always

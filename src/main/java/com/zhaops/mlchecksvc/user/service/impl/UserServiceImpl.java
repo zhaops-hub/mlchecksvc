@@ -97,9 +97,11 @@ public class UserServiceImpl implements UserService {
     public UserDto login(String userName, String password) {
         User user = this.userRepository.login(userName, password);
 
-        /**修改最后登录时间 */
-        user.setLastLoginTime(new Date());
-        user = this.userRepository.save(user);
+        if (user != null) {
+            /**修改最后登录时间 */
+            user.setLastLoginTime(new Date());
+            user = this.userRepository.save(user);
+        }
 
         return user != null ? new UserDto(user) : null;
     }
