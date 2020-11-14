@@ -1,6 +1,7 @@
 package com.zhaops.mlchecksvc.user.api;
 
 import com.auth0.jwt.JWT;
+import com.zhaops.mlchecksvc.user.common.PassToken;
 import com.zhaops.mlchecksvc.user.common.UserLoginToken;
 import com.zhaops.mlchecksvc.user.dto.ResultModel;
 import com.zhaops.mlchecksvc.user.dto.UserDto;
@@ -63,9 +64,75 @@ public class UserEndpoint {
      * @param userDto
      * @return
      */
+    @UserLoginToken
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public UserDto update(@RequestBody UserDto userDto) {
-        return this.userService.save(userDto);
+    public ResultModel<UserDto> update(@RequestBody UserDto userDto) {
+        ResultModel<UserDto> result = new ResultModel<>();
+        UserDto user = new UserDto();
+        String msg = this.addCheck(userDto);
+        if (msg != "") {
+            result.setCode(-1);
+            result.setMsg(msg);
+            return result;
+        }
+
+        if (userDto.getId() != null) {
+            user = this.userService.update(userDto);
+        } else {
+            user = this.userService.save(userDto);
+        }
+        result.setCode(0);
+        result.setData(user);
+        return result;
+    }
+
+    /**
+     * 禁用
+     *
+     * @param id
+     * @return
+     */
+    @UserLoginToken
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    public ResultModel<UserDto> delete(@PathVariable String id) {
+        ResultModel<UserDto> result = new ResultModel<>();
+        Long longId = Long.parseLong(id);
+        UserDto user = this.userService.load(longId);
+        if (user != null) {
+            user.setIsDelete(1);
+            user = this.userService.update(user);
+            result.setCode(0);
+            result.setData(user);
+        } else {
+            result.setCode(-1);
+            result.setMsg("用户不存在！");
+        }
+
+        return result;
+    }
+
+    /**
+     * 恢复账号
+     *
+     * @return
+     */
+    @UserLoginToken
+    @RequestMapping(value = "/resume/{id}", method = RequestMethod.GET)
+    public ResultModel<UserDto> resume(@PathVariable String id) {
+        ResultModel<UserDto> result = new ResultModel<>();
+        Long longId = Long.parseLong(id);
+        UserDto user = this.userService.load(longId);
+        if (user != null) {
+            user.setIsDelete(0);
+            user = this.userService.update(user);
+            result.setCode(0);
+            result.setData(user);
+        } else {
+            result.setCode(-1);
+            result.setMsg("用户不存在！");
+        }
+
+        return result;
     }
 
 
@@ -76,6 +143,7 @@ public class UserEndpoint {
      * @param userDto
      * @return
      */
+    @PassToken
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResultModel<UserLoginModel> login(@RequestBody UserDto userDto) {
         ResultModel<UserLoginModel> result = new ResultModel<>();
@@ -87,11 +155,16 @@ public class UserEndpoint {
             return result;
         }
 
+        if (user.getIsDelete() == 1) {
+            result.setCode(-1);
+            result.setMsg("账号已被禁用！");
+            return result;
+        }
+
         /**判断公司名称
          * 超级管理员不用做判断
          * */
-
-        if (user.getIsAdmin() != 1 && user.getCompanyName() != userDto.getCompanyName()) {
+        if (user.getIsAdmin() != 1 && !user.getCompanyName().equals(userDto.getCompanyName())) {
             result.setCode(-1);
             result.setMsg("公司名称输入不正确！");
             return result;
@@ -99,6 +172,7 @@ public class UserEndpoint {
 
         UserLoginModel loginModel = new UserLoginModel();
         loginModel.setToken(tokenService.getToken(user));
+        loginModel.setUser(user);
         result.setData(loginModel);
         return result;
     }
@@ -144,18 +218,60 @@ public class UserEndpoint {
     }
 
     /**
+     * 获取用户信息
+     *
+     * @param id
+     * @return
+     */
+    @UserLoginToken
+    @RequestMapping(value = "/getUser/{id}", method = RequestMethod.GET)
+    public ResultModel<UserDto> getUser(@PathVariable String id) {
+        ResultModel<UserDto> result = new ResultModel<>();
+        result.setCode(0);
+        UserDto user = userService.load(Long.parseLong(id));
+        result.setData(user);
+        return result;
+    }
+
+    /**
      * 查看用户名是否存在
      *
      * @param userName
      * @return
      */
     @UserLoginToken
-    @RequestMapping(value = "/existUserName/{userName}", method = RequestMethod.GET)
-    public ResultModel<Boolean> existUserName(@PathVariable String userName) {
+    @RequestMapping(value = "/existUserName/{userName}/{userId}", method = RequestMethod.GET)
+    public ResultModel<Boolean> existUserName(@PathVariable(value = "userName") String userName, @PathVariable(value = "userId", required = false) String userId) {
         ResultModel<Boolean> result = new ResultModel<>();
         result.setCode(0);
-        Boolean isExit = this.userService.existUserName(userName) != null;
+        UserDto user = this.userService.existUserName(userName);
+        Boolean isExit = user != null;
+        if (userId != "") {
+            isExit = user.getId() != Long.parseLong(userId);
+        }
+
         result.setData(isExit);
+        return result;
+    }
+
+    /**
+     * 检查添加/修改参数是否正确
+     *
+     * @param userDto
+     * @return
+     */
+    private String addCheck(UserDto userDto) {
+        String result = "";
+        UserDto user = this.userService.existUserName(userDto.getUserName());
+        if (userDto.getId() != null) {
+            if (user != null && !user.getId().equals(userDto.getId())) {
+                result = "用户名" + user.getUserName() + "已存在!";
+            }
+        } else {
+            if (user != null) {
+                result = "用户名" + user.getUserName() + "已存在!";
+            }
+        }
         return result;
     }
 }

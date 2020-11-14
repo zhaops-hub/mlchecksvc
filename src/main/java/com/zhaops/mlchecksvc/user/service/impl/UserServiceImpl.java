@@ -81,6 +81,34 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserDto update(UserDto userDto) {
+        User user = this.userRepository.findById(userDto.getId()).get();
+        if (user != null) {
+            if (!userDto.getCompanyName().equals("")) {
+                user.setCompanyName(userDto.getCompanyName());
+            }
+            if (!userDto.getExpired().equals(null)) {
+                user.setExpired(userDto.getExpired());
+            }
+            if (userDto.getIsAdmin() > -1) {
+                user.setIsAdmin(userDto.getIsAdmin());
+            }
+            if (!userDto.getPassword().equals("")) {
+                user.setPassword(userDto.getPassword());
+            }
+
+            if (userDto.getIsDelete() > -1) {
+                user.setIsDelete(userDto.getIsDelete());
+            }
+
+            user = this.userRepository.save(user);
+        }
+
+
+        return new UserDto(user);
+    }
+
+    @Override
     public UserDto load(Long id) {
         User user = this.userRepository.findById(id).get();
         return new UserDto(user);

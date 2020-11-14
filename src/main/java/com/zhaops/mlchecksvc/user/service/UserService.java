@@ -35,6 +35,13 @@ public interface UserService {
      */
     UserDto save(UserDto userDto);
 
+    /**
+     * 保存/更新用户
+     *
+     * @param userDto
+     * @return
+     */
+    UserDto update(UserDto userDto);
 
     /**
      * 加载指定的用户信息
