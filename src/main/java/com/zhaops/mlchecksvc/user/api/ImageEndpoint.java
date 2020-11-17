@@ -25,7 +25,18 @@ public class ImageEndpoint {
         urls.setFaceUrl(result);
         urls.setDefault(true);
         face.setFaceUrls(urls);
+        face.setName("测试人脸");
         list.add(face);
+
+        result = ImgBase64.getImgStr("/opt/img2.jpg");
+        face = new FaceModel();
+        urls = new FaceUrls();
+        urls.setFaceUrl(result);
+        urls.setDefault(true);
+        face.setFaceUrls(urls);
+        face.setName("赵培胜");
+        list.add(face);
+
         return list;
     }
 }
