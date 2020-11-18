@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -160,6 +161,18 @@ public class UserEndpoint {
             result.setMsg("账号已被禁用！");
             return result;
         }
+
+        long longExpired = 0;
+        if (user.getExpired() != null) {
+            longExpired = user.getExpired().getTime();
+            long time = System.currentTimeMillis();
+            if (longExpired < time) {
+                result.setCode(-1);
+                result.setMsg("账号已过期！");
+                return result;
+            }
+        }
+
 
         /**判断公司名称
          * 超级管理员不用做判断

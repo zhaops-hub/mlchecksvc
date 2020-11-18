@@ -93,10 +93,6 @@ public class UserServiceImpl implements UserService {
             if (userDto.getIsAdmin() > -1) {
                 user.setIsAdmin(userDto.getIsAdmin());
             }
-            if (!userDto.getPassword().equals("")) {
-                user.setPassword(userDto.getPassword());
-            }
-
             if (userDto.getIsDelete() > -1) {
                 user.setIsDelete(userDto.getIsDelete());
             }
